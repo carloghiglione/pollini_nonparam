@@ -62,12 +62,17 @@ library(dplyr)
 ris <- acad_staff%>%
   right_join(stud_per_staff, by='country')
 
+colnames(ris)[1] <- 'Country'
+#sistemo i nomi sbagliati
+ris$Country <- as.character(ris$Country)
+ris$Country[37] <- 'GB'
+ris$Country[11] <- 'GR'
 
 ###################################################################################
 eco_tab <- read.csv('Eco_data_UR.csv', header = T, sep=';')
-colnames(ris)[1] <- 'Country'
+
 
 eco_tab_complete <- ris %>%
   inner_join(eco_tab, by='Country')
 
-write.csv(eco_tab_complete, file='Eco_data_UR_11_10_21.csv', row.names = F, quote = F)
+write.csv(eco_tab_complete, file='Eco_data_UR_12_10_21.csv', row.names = F, quote = F)
