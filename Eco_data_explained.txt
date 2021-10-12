@@ -1,3 +1,8 @@
+nomi:
+UR: Solo Unione Europea
+EXT: anche paesi europei fuori EU
+
+
 GDP = GDP per capita in USD
 
 Research = percentuale della spesa pubblica destinata alla ricerca

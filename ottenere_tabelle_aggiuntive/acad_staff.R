@@ -75,4 +75,4 @@ eco_tab <- read.csv('Eco_data_UR.csv', header = T, sep=';')
 eco_tab_complete <- ris %>%
   inner_join(eco_tab, by='Country')
 
-write.csv(eco_tab_complete, file='Eco_data_UR_12_10_21.csv', row.names = F, quote = F)
+#write.csv(eco_tab_complete, file='Eco_data_UR_12_10_21.csv', row.names = F, quote = F)
