@@ -1,6 +1,6 @@
 tabel_full <- read.csv('DATASET_def_small.csv', sep=';', header=T)
 
-idx <- which(tabel_full$Country_code_A2=='IS')
+idx <- which(tabel_full$Country_code_A2=='UA')
 
 add_line <- c(
 rowMeans(tabel_full[idx, 5:15], na.rm = T),
