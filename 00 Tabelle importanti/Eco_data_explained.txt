@@ -29,5 +29,7 @@ fonte: Eurostat
 stud_per_staff: average of students per academic staff at university in 2013-2019
 fonte: Eurostat
 
+num_ric: average number of researchers in period 2013 - 2019, fonte OECD
+
 cit_per_doc: average number of citations per document in the period 1996-2020
 fonte: Scimago Journal & Country Rank
