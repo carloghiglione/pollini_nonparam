@@ -85,6 +85,7 @@ lines(xx, b[1] + b[2]*xx + b[3]*xx^2 + b[4]*xx^3, col='red')
 # linear model on normalized flow
 flow.norm[4] <- NA    # tolgo Cipro
 flow.norm[19] <- NA    # tolgo Lussemburgo
+# non toglierli con la cubic spline
 
 # mod.norm <- lm(flow.norm ~ scores.pca.std + I(scores.pca.std^2) + I(scores.pca.std^3))
 mod.norm <- lm(flow.norm ~ scores.pca.std)   # è il migliore
