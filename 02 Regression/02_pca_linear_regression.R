@@ -85,9 +85,9 @@ lines(xx, b[1] + b[2]*xx, col='red')
 #################################################################################
 # LINEAR REGRESSION ON NORMALIZED FLOW
 
-# remove outliers
-flow.norm[4] <- NA    # tolgo Cipro
-flow.norm[19] <- NA    # tolgo Lussemburgo
+# remove outliers (4 Cipro e 19 Lussemburgo)
+flow.norm <- flow.norm[-c(4,19)]
+scores.pc1 <- scores.pc1[-c(4,19)]
 
 mod.norm <- lm(flow.norm ~ scores.pc1)   # è il migliore
 summary(mod.norm)
@@ -113,3 +113,35 @@ mod.list <- lapply(1:max_ord, function(deg){lm(flow.norm ~ poly(scores.pc1, degr
 do.call(anova, mod.list)
 
 # it resuts that linear model is sufficient
+
+
+
+############################################################################################
+# K-FOLD CROSS-VALIDATION
+
+source('quantile_kfold.R')
+
+n_fold <- 5
+set.seed(1234)
+data.fr <- data.frame(flow.norm=flow.norm, scores.pc1 = scores.pc1)
+kfolds <- quantile_kfold(n_fold, data.fr, 'scores.pc1')
+RMSE <- numeric(n_fold)
+
+for(i in 1:n_fold){
+  curr_data <- kfolds$datasets[[i]]
+  curr_miss <- kfolds$folds[[i]]
+  mod.curr <- lm(flow.norm ~ scores.pc1, data = curr_data)
+  
+  RMSE[i] <- sqrt(mean((predict(mod.curr, curr_miss) - curr_miss$flow.norm)^2))
+  
+  x11()
+  b <- mod.curr$coefficients
+  xx = seq(min(scores.pc1), max(scores.pc1), length = 100)
+  plot(curr_data$scores.pc1, curr_data$flow.norm, main = "Normalized Flow vs pca", 
+       xlim = range(scores.pc1), ylim = range(flow.norm))
+  lines(xx, b[1] + b[2]*xx, col='red')
+  points(curr_miss$scores.pc1, curr_miss$flow.norm, col='blue', pch=19)
+  points(curr_miss$scores.pc1, predict(mod.curr, curr_miss), col='blue', pch='x')
+}
+RMSE <- mean(RMSE)
+RMSE

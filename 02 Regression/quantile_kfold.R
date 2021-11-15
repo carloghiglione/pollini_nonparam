@@ -23,17 +23,17 @@ quantile_kfold <- function(n_fold, df, col_name){
       fold_assign <- c(sample(n_fold, replace = F), sample(n_fold, 1))   # assign the fold number for each element of the base set
     }
     for(j in 1:n_curr){
-      folds[[fold_assign[j]]] <- rbind(folds[[fold_assign[j]]], base_for_folds[[i]] %>%                    # add the current element in the base set to the corresponding fold
-                                                                                    slice(j) %>% 
-                                                                                    select(-groups) %>% 
-                                                                                    as.data.frame)
+      folds[[fold_assign[j]]] <- rbind(folds[[fold_assign[j]]], base_sets[[i]] %>%                    # add the current element in the base set to the corresponding fold
+                                                                                slice(j) %>% 
+                                                                                select(-groups) %>% 
+                                                                                as.data.frame)
     }
   }
   
   # aggregate the folds in the n_fold datasets
-  full_folds <- vector('list', n_fold)
+  datasets <- vector('list', n_fold)
   for(i in 1:n_fold){
-    full_folds[[i]] <- bind_rows(folds[seq(1,n_fold)[-i]])
+    datasets[[i]] <- bind_rows(folds[seq(1,n_fold)[-i]])
   }
-  return(full_folds)
+  return(list(folds=folds, datasets=datasets))
 }
