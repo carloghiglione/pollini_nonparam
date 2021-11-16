@@ -1,0 +1,107 @@
+##########################
+quantile_kfold
+- funzione che riceve in ingresso il numero di fold 'n_fold', un dataframe 'df' e il nome 'name' di una delle variabili
+- crea 'n_fold' folds con dati campionati il più uniformemente possibile nel range della variabile 'name'
+- meccanismo spiegato con un esempio:
+se ho ad esempio 30 dati e 'n_fold' = 5:
+- creo i quantili q0, ..., q6 della variabile 'name' (q0 =0%, q6 = 100%)
+- raggruppo i dati della variabile 'name secondo i 30/5=6 gruppi [q0, q1], ..., [q5, q6]
+- in ogni fold, metto un elemento di ognuno dei 6 gruppi
+In tal modo ho fatto dei fold che contengono ciascuno dei dati equamente distribuiti lungo il range della variabile 'name'.
+Così trainando il modello e testandolo non si hanno dei kfold disomogenei che 
+potrebbero dare delle performance ballate essendo i dati poco numerosi
+
+
+##########################
+01_classic_regression
+- analisi esplorative dei dati multivariati
+- poco importante
+
+
+##########################
+02_pca_linear_regression
+- dati: flow, flow.norm vs citations.per.document, stud_per_staff, Research, uni_score_norm
+- fatta PCA sui quattro regressori, selezionata prima PCA (scores.pc1)
+- linear regression flow vs scores.pc1
+- linear regression flow.norm vs scores.pc1: o rimozione outlier (Cipro e Lussemburgo)
+                                             o calcolo RMSE
+- polynomial regression: o ordine da 1 a 8
+                         o anova test per il confronto
+- custom k-fold cross-validation per calcolo RMSE
+
+
+##########################
+03_pca_kernel_regression
+- dati: flow.norm vs citations.per.document, stud_per_staff, Research, uni_score_norm
+- fatta PCA sui quattro regressori, selezionata prima PCA (scores.pc1)
+- rimozione outliers (Cipro e Lussemburgo)
+- gaussian kernel local averaging regression flow vs scores.pc1 gaussian kernel:
+		o optimal bandwidth selection with native cross-validation with LS method;
+		o calcolo RMSE
+- calcolo RMSE e optimal bandwidth con la custom k-fold cross-validation
+- kernel gaussian local averaging regression con l'optimal bandwidth
+
+
+##########################
+04_pca_kernel_knn_regression
+- dati: flow.norm vs citations.per.document, stud_per_staff, Research, uni_score_norm
+- fatta PCA sui quattro regressori, selezionata prima PCA (scores.pc1)
+- rimozione outliers (Cipro e Lussemburgo)
+- mixed gaussian kernel-knn local regression flow vs scores.pc1 (adaptive nn method):
+		o optimal number of neighbors selection with native cross-validation with LS method;
+		o calcolo RMSE
+- calcolo RMSE e optimal number of neighbors con la custom k-fold cross-validation
+- mixed gaussian kernel-knn local regression con l'optimal number of neighbors
+
+
+##########################
+05_b-spline
+- dati: flow.norm vs citations.per.document, stud_per_staff, Research, uni_score_norm
+- fatta PCA sui quattro regressori, selezionata prima PCA (scores.pc1)
+- rimozione outliers (Cipro e Lussemburgo)
+- cubic B-spline regression flow vs scores.pc1 (knots at even quantiles):
+		o number of knots selected with trials and errors;
+		o calcolo RMSE
+- calcolo RMSE e optimal number of knots con la custom k-fold cross-validation
+- cubic B-spline regression con l'optimal number of knots
+
+
+##########################
+06_natural_b-spline
+- dati: flow.norm vs citations.per.document, stud_per_staff, Research, uni_score_norm
+- fatta PCA sui quattro regressori, selezionata prima PCA (scores.pc1)
+- rimozione outliers (Cipro e Lussemburgo)
+- natural cubic B-spline regression flow vs scores.pc1 (knots at even quantiles):
+		o number of knots selected with trials and errors;
+		o calcolo RMSE
+- calcolo RMSE e optimal number of knots con la custom k-fold cross-validation
+- natural cubic B-spline regression con l'optimal number of knots
+
+
+##########################
+07_smooth_splines
+- dati: flow.norm vs citations.per.document, stud_per_staff, Research, uni_score_norm
+- fatta PCA sui quattro regressori, selezionata prima PCA (scores.pc1)
+- rimozione outliers (Cipro e Lussemburgo)
+- smoothing cubic B-spline regression flow vs scores.pc1 (knots at even quantiles):
+		o optimal lambda selection with native cross-validation with LOOCV and GCV methods;
+		o calcolo RMSE
+- calcolo RMSE e optimal lambda con la custom k-fold cross-validation
+- cubic B-spline regression con l'optimal number of knots
+
+
+###########################
+08_GAM
+- dati: flow.norm vs citations.per.document, stud_per_staff, Research, uni_score_norm
+- rimozione outliers (Cipro e Lussemburgo)
+- multivariate linear model sui quattro regressori
+- GAM with smoothing cubic splines tenendo solo stud_per_staff lineare
+
+
+###########################
+09_GAM_pca
+- dati: flow.norm vs citations.per.document, stud_per_staff, Research, uni_score_norm
+- fatta PCA sui quattro regressori, selezionate prime 3 PCA (scores.pc1, scores.pc2, scores.pc3)
+- rimozione outliers (Cipro e Lussemburgo)
+- GAM with smoothing cubic splines sulle tre PCA
+- risultati brutti
