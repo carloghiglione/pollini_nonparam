@@ -25,7 +25,7 @@ quantile_kfold <- function(n_fold, df, col_name){
     for(j in 1:n_curr){
       folds[[fold_assign[j]]] <- rbind(folds[[fold_assign[j]]], base_sets[[i]] %>%                    # add the current element in the base set to the corresponding fold
                                                                                 slice(j) %>% 
-                                                                                select(-groups) %>% 
+                                                                                dplyr::select(-groups) %>% 
                                                                                 as.data.frame)
     }
   }

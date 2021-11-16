@@ -43,59 +43,6 @@ scores.pc1 <- scores.pc1[-c(4,19)]
 
 
 
-##################################################################################
-# KERNEL LOCAL AVERAGING REGRESSION
-# BANDWIDTH SELECTION WITH CROSS-VALIDATION ON LS
-
-mod.ker <- npreg(flow.norm ~ scores.pc1, ckertype = 'gaussian', bwmethod="cv.ls")
-summary(mod.ker)
-
-xx <- seq(min(scores.pc1), max(scores.pc1), length.out = 1000)
-preds <- predict(mod.ker, newdata = data.frame(scores.pc1 = xx), se.fit=T)
-x11()
-plot(scores.pc1, flow.norm, main = 'Gaussian kernel regression')
-lines(xx, preds$fit, col='red', lwd=2)
-matlines(xx, cbind(preds$fit - 2*preds$se.fit , preds$fit + 2*preds$se.fit ), 
-         lty = 2, col = 'red', lwd=2)
-
-# bandwidth
-mod.ker$bw
-
-# MSE
-mod.ker$MSE
-
-
-
-##################################################################################
-# MIXED GAUSSIAN KERNEL & KNN LOCAL LINEAR REGRESSION
-# NUMBER OF NEIGHBORS SELECTION WITH CROSS-VALIDATION ON LS
-
-# direcly select number of neighbors
-k <- 5
-# select span
-n <- sum(!is.na(flow.norm))
-span <- 0.05
-k <- as.integer(span*n)
-
-mod.knn <- npreg(flow.norm ~ scores.pc1, bwtype='adaptive_nn', bwmethod="cv.ls", ckertype = 'gaussian')
-summary(mod.knn)
-
-xx <- seq(min(scores.pc1), max(scores.pc1), length.out = 1000)
-preds <- predict(mod.knn, newdata = data.frame(scores.pc1 = xx), se.fit=T)
-x11()
-plot(scores.pc1, flow.norm, main = 'KNN regression')
-lines(xx, preds$fit, col='red', lwd=2)
-matlines(xx, cbind(preds$fit - 2*preds$se.fit , preds$fit + 2*preds$se.fit ), 
-         lty = 2, col = 'red', lwd=2)
-
-# number of neighbors
-mod.ker$bw
-
-# MSE
-mod.knn$MSE
-
-
-
 #######################################################################################
 # CUBIC B-SPLINES (ORDER = 3), SET THE DEGREES OF FREEDOM
 # KNOTS ARE PLACED AT THE CENTRAL (DOF - ORDER) EVEN QUANTILES (EXCLUDING 0% AND 100%)

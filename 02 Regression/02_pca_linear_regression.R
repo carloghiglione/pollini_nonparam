@@ -103,6 +103,10 @@ xx = seq(min(scores.pc1), max(scores.pc1), length = 100)
 plot(scores.pc1, flow.norm, main = "Normalized Flow vs pca")
 lines(xx, b[1] + b[2]*xx, col='red')
 
+RMSE <- sqrt(mean(mod.norm$fitted.values^2))
+RMSE
+
+
 
 ############################################################################################
 # POLYNOMIAL REGRESSION
@@ -118,11 +122,12 @@ do.call(anova, mod.list)
 
 ############################################################################################
 # K-FOLD CROSS-VALIDATION
+# I use it to estimate the Root-Mean-Square-Error
 
 source('quantile_kfold.R')
 
 n_fold <- 5
-set.seed(1234)
+set.seed(1)
 data.fr <- data.frame(flow.norm=flow.norm, scores.pc1 = scores.pc1)
 kfolds <- quantile_kfold(n_fold, data.fr, 'scores.pc1')
 RMSE <- numeric(n_fold)
@@ -145,3 +150,5 @@ for(i in 1:n_fold){
 }
 RMSE <- mean(RMSE)
 RMSE
+
+graphics.off()
