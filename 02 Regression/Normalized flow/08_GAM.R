@@ -16,7 +16,8 @@ flow.norm <- flow / full_tab$num_ric
 
 countries <- full_tab$Country
 
-tab <- data.frame(flow.norm, scale(full_tab[, c(4,6,8,17)]))
+#tab <- data.frame(flow.norm, scale(full_tab[, c(4,6,8,17)]))
+tab <- data.frame(flow.norm, full_tab[, c(4,6,8,17)])
 
 # remove NA (Cipro e Lussemburgo)
 tab <- tab[-c(4,19),]

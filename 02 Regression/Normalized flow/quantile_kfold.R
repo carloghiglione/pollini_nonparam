@@ -1,14 +1,16 @@
 # perform K-Fold crossvalidation composing the folds with an equal number of data
 # coming from the subsets of a given regressor defined by its evenly spaced quantiles
 
+
 quantile_kfold <- function(n_fold, df, col_name){
   require(dplyr)
   
   n_data <- dim(df)[1]                       # number of observations in the dataframe
   n_data_per_base <- floor(n_data/n_fold)    # number of base sets to build the folds
+  col_data <- sapply(df[col_name], as.numeric)
   
-  delimeters <- quantile(scores.pc1, seq(0,1, length.out = n_data_per_base+1))         # evenly spaced quantiles to delimit the base sets ranges
-  df$groups <- cut(sapply(df[col_name], as.numeric), delimeters, include.lowest = T)   # factor assigning the base set to each observation
+  delimeters <- quantile(col_data, seq(0,1, length.out = n_data_per_base+1))         # evenly spaced quantiles to delimit the base sets ranges
+  df$groups <- cut(col_data, delimeters, include.lowest = T)   # factor assigning the base set to each observation
   
   # build the base sets
   base_sets <- df %>%

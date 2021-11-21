@@ -1,0 +1,71 @@
+##########################
+quantile_kfold
+- funzione che riceve in ingresso il numero di fold 'n_fold', un dataframe 'df' e il nome 'name' di una delle variabili
+- crea 'n_fold' folds con dati campionati il più uniformemente possibile nel range della variabile 'name'
+- meccanismo spiegato con un esempio:
+se ho ad esempio 30 dati e 'n_fold' = 5:
+- creo i quantili q0, ..., q6 della variabile 'name' (q0 =0%, q6 = 100%)
+- raggruppo i dati della variabile 'name secondo i 30/5=6 gruppi [q0, q1], ..., [q5, q6]
+- in ogni fold, metto un elemento di ognuno dei 6 gruppi
+In tal modo ho fatto dei fold che contengono ciascuno dei dati equamente distribuiti lungo il range della variabile 'name'.
+Così trainando il modello e testandolo non si hanno dei kfold disomogenei che 
+potrebbero dare delle performance ballate essendo i dati poco numerosi
+
+
+
+##########################
+01_linear_regression
+- dati: log_flow vs uni_score
+- linear regression log_flow vs uni_score
+- custom k-fold cross-validation per calcolo RMSE
+
+
+##########################
+02_kernel_regression
+- dati: log_flow vs uni_score
+- gaussian kernel local averaging regression log_flow vs uni_score gaussian kernel:
+		o optimal bandwidth selection with native cross-validation with LS method;
+		o calcolo RMSE
+- calcolo RMSE e optimal bandwidth con la custom k-fold cross-validation
+- kernel gaussian local averaging regression con l'optimal bandwidth
+
+
+##########################
+03_kernel_knn_regression
+- dati: log_flow vs uni_score
+- mixed gaussian kernel-knn local regression log_flow vs uni_score (adaptive nn method):
+		o optimal number of neighbors selection with native cross-validation with LS method;
+		o calcolo RMSE
+- calcolo RMSE e optimal number of neighbors con la custom k-fold cross-validation
+- mixed gaussian kernel-knn local regression con l'optimal number of neighbors
+
+
+##########################
+04_b-spline
+- dati: log_flow vs uni_score
+- cubic B-spline regression log_flow vs uni_score (knots at even quantiles):
+		o number of knots selected with trials and errors;
+		o calcolo RMSE
+- calcolo RMSE e optimal number of knots con la custom k-fold cross-validation
+- cubic B-spline regression con l'optimal number of knots
+
+
+##########################
+05_natural_b-spline
+- dati: log_flow vs uni_score
+- natural cubic B-spline regression log_flow vs uni_score (knots at even quantiles):
+		o number of knots selected with trials and errors;
+		o calcolo RMSE
+- calcolo RMSE e optimal number of knots con la custom k-fold cross-validation
+- natural cubic B-spline regression con l'optimal number of knots
+
+
+##########################
+06_smooth_splines
+- dati: log_flow vs uni_score
+- smoothing cubic B-spline regression log_flow vs uni_score (knots at even quantiles):
+		o optimal lambda selection with native cross-validation with LOOCV and GCV methods;
+		o calcolo RMSE
+- calcolo RMSE e optimal lambda con la custom k-fold cross-validation
+- cubic B-spline regression con l'optimal number of knots
+

@@ -1,0 +1,7 @@
+			RMSE K-fold cross-valid | RMSE tutti i dati con optimized params
+linear regression:                     1.519333 | 1.181639
+kernel regression:                    0.6752273 | 0.5845503  (attenzione, il modello fa schifo)
+kernel knn regression:                0.6215914 | 0.5375441
+cubic B-spline regression:            0.7829797 | 0.5266507
+natural cubic B-spline:               0.6355823 | 0.5122736
+smoothing splines:                    0.6302645 | 0.6120386
