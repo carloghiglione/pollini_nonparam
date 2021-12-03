@@ -1,0 +1,33 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Tutorial per il test k-sample permutation test for equality of covariance matrices.
+
+```{r}
+library(fdcov)
+?ksample.perm  # the function to use
+```
+We import the files
+```{r}
+# load the smoothed dataset
+load("smoothed_net_flow.Rdata")
+load("functional_outliers_labels.Rdata") # the labels, 2 for outlier, 1 for not outlier
+```
+
+We then apply the test
+```{r}
+res <- ksample.perm(t(df.tot.smooth2), # transpose so every row is a func sample
+                    label, # 2 for outlier, 1 not outlier
+                    part=T,  # perform partial comparisons between (two) groups
+                    perm="sync",  # do it with syncronized permutations
+                    dist="hs")  # covariance matrix distance, hs is hilbert-scmidt distance. see ?ksample.perm for other ones
+res
+
+```
+And graph it:
+```{r}
+perm.plot(res, k=2, lab = c("Not outlier", "Outlier"))  # works only if we have more than 2 groups
+```
+
