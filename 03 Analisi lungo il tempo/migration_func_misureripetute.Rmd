@@ -11,7 +11,7 @@ Carico il dataset.
 
 ```{r}
 rm(list=ls())
-setwd("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/03 Analisi lungo il tempo/")
+#("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/03 Analisi lungo il tempo/")
 
 df <- read.csv("Flows_per_year.csv")
 df
