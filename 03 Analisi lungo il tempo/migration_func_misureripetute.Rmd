@@ -11,7 +11,7 @@ Carico il dataset.
 
 ```{r}
 rm(list=ls())
-setwd("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/03 Analisi lungo il tempo/")
+#setwd("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/03 Analisi lungo il tempo/")
 
 df <- read.csv("Flows_per_year.csv")
 df
@@ -161,13 +161,13 @@ outliers$ID_outliers
 
 ### Dati normalizzati
 ```{r}
-setwd("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/00 Tabelle importanti/")
+#setwd("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/00 Tabelle importanti/")
 aux.df <- read.csv(file="Eco_data_29_10_21.csv")
 aux.df = aux.df[, c(1, ncol(aux.df))]
 aux.df
 ```
 ```{r}
-setwd("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/03 Analisi lungo il tempo/")
+#setwd("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/03 Analisi lungo il tempo/")
 df.ok.tot <- merge(df.ok.tot, aux.df, by.x="row.names", by.y="Country")
 row.names(df.ok.tot) <- df.ok.tot[,1]
 df.ok.tot = df.ok.tot[,-1]
