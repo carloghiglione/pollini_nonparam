@@ -38,6 +38,8 @@ lines(xx, b[1] + b[2]*xx, col='red')
 RMSE <- sqrt(mean((mod$residuals)^2))
 RMSE
 
+extractAIC(mod)
+
 
 ############################################################################################
 # K-FOLD CROSS-VALIDATION

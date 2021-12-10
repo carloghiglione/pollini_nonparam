@@ -1,7 +1,49 @@
-			RMSE K-fold cross-valid | RMSE tutti i dati con optimized params
-linear regression:                  0.003756945 | 0.004038480
-kernel regression:                  0.004014517 | 0.003638466
-kernel knn regression:              0.003996911 | 0.003533549
-cubic B-spline regression:          0.004922436 | 0.003253561
-natural cubic B-spline:             0.003821501 | 0.003604104
-smoothing splines:                  0.003743500 | 0.003570780
+#################
+model selection with Stratified K-FOLD cross-validation on RMSE
+	
+			RMSE K-fold cross-valid best model
+linear regression:                  0.003756945 
+kernel regression:                  0.004014517 
+kernel knn regression:              0.003996911 
+cubic B-spline regression:          0.004922436 
+natural cubic B-spline:             0.003821501 
+smoothing splines:                  0.003743500 
+
+
+		 RMSE modello con optimized params wrt tutti i dati
+linear regression:                  0.004038480
+kernel regression:                  0.003638466
+kernel knn regression:              0.003533549
+cubic B-spline regression:          0.003253561
+natural cubic B-spline:             0.003604104
+smoothing splines:                  0.003570780
+
+
+			AIC modello con optimized param
+linear regression:                  -366.4319
+kernel regression:                  NA
+kernel knn regression:              NA
+cubic B-spline regression:          -360.0483
+natural cubic B-spline:             -365.295
+smoothing splines:                  NA (potrei calcolarlo ma perdita di tempo)
+
+
+#################
+model selection with AIC
+
+			AIC modello con optimized param
+linear regression:                  -366.4319
+kernel regression:                  NA
+kernel knn regression:              NA
+cubic B-spline regression:          -362.9117
+natural cubic B-spline:             -365.295
+smoothing splines:                  -272.782
+
+
+		RMSE modello con optimized params wrt tutti i dati
+linear regression:                  0.004038480
+kernel regression:                  0.00373254
+kernel knn regression:              0.003759683
+cubic B-spline regression:          0.003516894
+natural cubic B-spline:             0.003604104
+smoothing splines:                  0.006647777

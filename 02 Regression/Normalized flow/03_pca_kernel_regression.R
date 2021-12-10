@@ -47,15 +47,15 @@ scores.pc1 <- scores.pc1[-c(4,19)]
 
 ##################################################################################
 # KERNEL LOCAL AVERAGING REGRESSION
-# OPTIMAL BANDWIDTH DEFINED WITH NATIVE CV.LS PARAMETER
+# OPTIMAL BANDWIDTH DEFINED WITH NATIVE CV.AIC PARAMETER
 
-mod.ker <- npreg(flow.norm ~ scores.pc1, ckertype = 'gaussian', bwmethod="cv.ls")
+mod.ker <- npreg(flow.norm ~ scores.pc1, ckertype = 'gaussian', bwmethod="cv.aic")
 summary(mod.ker)
 
 xx <- seq(min(scores.pc1), max(scores.pc1), length.out = 1000)
 preds <- predict(mod.ker, newdata = data.frame(scores.pc1 = xx), se.fit=T)
 x11()
-plot(scores.pc1, flow.norm, main = 'Gaussian kernel regression')
+plot(scores.pc1, flow.norm, main = 'Gaussian kernel regression, AIC model')
 lines(xx, preds$fit, col='red', lwd=2)
 matlines(xx, cbind(preds$fit - 2*preds$se.fit , preds$fit + 2*preds$se.fit ), 
          lty = 2, col = 'red', lwd=2)
