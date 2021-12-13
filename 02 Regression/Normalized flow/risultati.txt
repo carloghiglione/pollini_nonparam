@@ -46,4 +46,4 @@ kernel regression:                  0.00373254
 kernel knn regression:              0.003759683
 cubic B-spline regression:          0.003516894
 natural cubic B-spline:             0.003604104
-smoothing splines:                  0.006647777
+smoothing splines:                  0.003651545

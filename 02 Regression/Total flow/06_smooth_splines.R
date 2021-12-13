@@ -6,6 +6,7 @@ library(splines)
 library(fda)
 library(pbapply)
 library(parallel)
+library(npreg)
 
 full_tab <- read.csv('full_tab_31_10_21.csv')
 

@@ -107,7 +107,7 @@ plot(s.spline.opt.aic)              # plots 95% confidence interval
 points(scores.pc1, flow.norm)
 abline(v=s.spline.opt.aic$fit$knot, lty=2, col='gray')
 
-RMSE.AIC <- sqrt(mean((predict(s.spline.opt.aic, uni_score)$y - log_flow)^2))
+RMSE.AIC <- sqrt(mean((predict(s.spline.opt.aic, scores.pc1)$y - flow.norm)^2))
 RMSE.AIC
 
 
