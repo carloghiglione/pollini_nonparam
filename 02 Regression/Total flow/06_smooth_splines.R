@@ -26,7 +26,7 @@ plot(uni_score, log_flow, main='Total flow vs Uni Score')
 
 
 ###############################################################
-# SMOOTHING CUBIC B-SPLINES 
+# SMOOTHING CUBIC B-SPLINES (native R function)
 # SELECT OPTIMAL LAMBDA WITH CROSS-VALIDATION
 
 fit.s.spline.loocv <- smooth.spline(uni_score, log_flow, cv=T)
@@ -39,8 +39,59 @@ lines(fit.s.spline.loocv, col='red', lwd=2)
 legend('bottomright', legend = c('LOOCV', 'GCV'), fill = c('red', 'blue'))
 
 
+
+###############################################################
+# SMOOTHING CUBIC B-SPLINES
+# find optimal number of knots with AIC
+
+# set the grid of dof search
+knots.grid <- seq(3, 20, by=1)
+
+# function to find AIC for a certain bandwidth
+find.AIC <- function(curr.knots){
+  my_knots <- quantile(uni_score, seq(0, 1, length.out=curr.knots+2))[2:curr.knots+1]
+  mod.curr <- ss(uni_score, log_flow, method = 'AIC', knots = my_knots)
+  return(mod.curr$aic) 
+}
+
+
+# define cores for parallel computation
+cl <- makeCluster(detectCores())
+clusterExport(cl, varlist = list("log_flow", "uni_score","find.AIC", "ss"))
+AIC_wrapper <- function(curr.knots){find.AIC(curr.knots)} 
+
+# find AIC for all grid points with parallel computing
+all_AIC <- pbsapply(knots.grid, AIC_wrapper, cl=cl)
+
+
+# optimal number of neighbors, span and corresponding RMSE
+opt.knots.AIC <- knots.grid[which.min(all_AIC)]
+opt.knots.AIC
+min(all_AIC)
+
+x11()
+plot(knots.grid, all_AIC, type ='l', lwd='2', main='AIC vs #knots')
+abline(v=opt.knots.AIC, col='red', lwd=2)
+
+
+my_knots <- quantile(uni_score, seq(0, 1, length.out=opt.knots.AIC+2))[2:opt.knots.AIC+1]
+s.spline.opt.aic <- ss(uni_score, log_flow, method = 'AIC', knots = my_knots)
+summary(s.spline.opt.aic)
+s.spline.opt.aic$aic
+
+
+x11()
+plot(s.spline.opt.aic)              # plots 95% confidence interval
+points(uni_score, log_flow)
+abline(v=s.spline.opt.aic$fit$knot, lty=2, col='gray')
+
+RMSE.AIC <- sqrt(mean((predict(s.spline.opt.aic, uni_score)$y - log_flow)^2))
+RMSE.AIC
+
+
+
 ############################################################################################
-# I find RMSE and optimal span with CROSS-VALIDATION
+# I find optimal dof with RMSE computed on STRATIFIED K-FOLD CROSS-VALIDATION
 
 source('quantile_kfold.R')
 
@@ -81,13 +132,13 @@ opt.lam
 min(all_RMSE)
 
 x11()
-plot(lam.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs span')
+plot(lam.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs smoothing param')
 abline(v=opt.lam, col='red', lwd=2)
 
 
 
 #######################################################################################
-# SMOOTHING CUBIC B-SPLINES WITH OPTIMAAL LAMBDA
+# SMOOTHING CUBIC B-SPLINES WITH OPTIMAL LAMBDA
 
 fit.smooth.opt <- smooth.spline(uni_score, log_flow, lambda = opt.lam)
 

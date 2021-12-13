@@ -27,15 +27,15 @@ plot(uni_score, log_flow, main='Total flow vs Uni Score')
 
 ##################################################################################
 # KERNEL LOCAL AVERAGING REGRESSION
-# OPTIMAL BANDWIDTH DEFINED WITH NATIVE CV.LS PARAMETER
+# OPTIMAL BANDWIDTH DEFINED WITH NATIVE CV.AIC PARAMETER
 
-mod.ker <- npreg(log_flow ~ uni_score, ckertype = 'gaussian', bwmethod="cv.ls")
+mod.ker <- npreg(log_flow ~ uni_score, ckertype = 'gaussian', bwmethod="cv.aic")
 summary(mod.ker)
 
-xx <- seq(min(uni_score), max(uni_score), length.out = 15)
+xx <- seq(min(uni_score), max(uni_score), length.out = 1000)
 preds <- predict(mod.ker, newdata = data.frame(uni_score = xx), se.fit=T)
 x11()
-plot(uni_score, log_flow, main = 'Gaussian kernel regression')
+plot(uni_score, log_flow, main = 'Gaussian kernel regression, AIC model')
 lines(xx, preds$fit, col='red', lwd=2)
 matlines(xx, cbind(preds$fit - 2*preds$se.fit , preds$fit + 2*preds$se.fit ), 
          lty = 2, col = 'red', lwd=2)
@@ -74,7 +74,7 @@ find.RMSE.ker <- function(curr.bws, n_fold, kfolds){
 
 
 # set the grid of bandwidth for search
-bws.grid <- seq(0.1, 20, by=0.1)
+bws.grid <- seq(0.1, 2.5, by=0.01)
 
 # define cores for parallel computation
 cl <- makeCluster(detectCores())

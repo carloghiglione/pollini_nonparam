@@ -62,6 +62,7 @@ mod.gam <- gam(flow.norm ~ s(scores.pc1, bs='cr') + s(scores.pc2, bs='cr')+ s(sc
 summary(mod.gam)
 
 
+
 # diagnostic
 x11()
 par(mfrow=c(2,2))

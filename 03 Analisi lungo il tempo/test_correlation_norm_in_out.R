@@ -5,8 +5,8 @@ library(roahd)
 
 set.seed(1234)
 
-inflow <- read.csv('year_inflow.csv')
-outflow <- read.csv('year_outflow.csv')
+inflow <- read.csv('norm_year_inflow.csv')
+outflow <- read.csv('norm_year_outflow.csv')
 
 full_tab <- read.csv('full_tab_31_10_21.csv')
 
@@ -23,6 +23,15 @@ inflow[k] <- rowMeans(inflow[,-1], na.rm=TRUE)[k[,1]]
 
 k <- which(is.na(outflow), arr.ind=TRUE)
 outflow[k] <- rowMeans(outflow[,-1], na.rm=TRUE)[k[,1]]
+
+
+
+remove_outlier = F
+if(remove_outlier){
+  inflow <- norm_inflow[-4,]     # tolgo biellorussia che ha valori troppo alti (anche se tenerlo non cambia)
+  outflow <- norm_outflow[-4,]
+  n <- n-1
+}
 
 
 
@@ -54,9 +63,6 @@ tt.grid <- seq(2006, 2015, length.out = 1000)
 inflow.eval <- t(eval.fd(tt.grid, inflow.fd))     # I transpose because in fData I need data by row
 outflow.eval <- t(eval.fd(tt.grid, outflow.fd))   # I transpose because in fData I need data by row
 
-# I  can eventually rescale the countries st they are all in the same scale, this makes the H0 not to be rejected
-# inflow.eval <- t(scale(eval.fd(tt.grid, inflow.fd)))     # I transpose because in fData I need data by row
-# outflow.eval <- t(scale(eval.fd(tt.grid, outflow.fd)))   # I transpose because in fData I need data by row
 
 fData.in <- fData(tt.grid, inflow.eval)
 fData.out <- fData(tt.grid, outflow.eval)
@@ -92,4 +98,3 @@ abline(v=SPC0, col='red', lwd=3)
 
 pvalue <- sum(SPC>=SPC0)/B
 pvalue
-

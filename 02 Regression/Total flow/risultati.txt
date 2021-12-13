@@ -1,7 +1,49 @@
-			RMSE K-fold cross-valid | RMSE tutti i dati con optimized params
-linear regression:                     1.519333 | 1.181639
-kernel regression:                    0.6752273 | 0.5845503  (attenzione, il modello fa schifo)
-kernel knn regression:                0.6215914 | 0.5375441
-cubic B-spline regression:            0.7829797 | 0.5266507
-natural cubic B-spline:               0.6355823 | 0.5122736
-smoothing splines:                    0.6302645 | 0.6120386
+#################
+model selection with Stratified K-FOLD cross-validation on RMSE
+
+			RMSE K-fold cross-valid best model
+linear regression:                  1.519333 
+kernel regression:                  0.6699857  (attenzione, il modello fa schifo)
+kernel knn regression:              0.6215914 
+cubic B-spline regression:          0.7829797 
+natural cubic B-spline:             0.6355823 
+smoothing splines:                  0.6302645
+
+
+		 RMSE modello con optimized params wrt tutti i dati
+linear regression:                  1.181639
+kernel regression:                  0.569026  (attenzione, il modello fa schifo)
+kernel knn regression:              0.5375441
+cubic B-spline regression:          0.5266507
+natural cubic B-spline:             0.521259
+smoothing splines:                  0.6120386
+
+
+			AIC modello con optimized param
+linear regression:                  15.6832
+kernel regression:                  NA
+kernel knn regression:              NA
+cubic B-spline regression:          -32.88524
+natural cubic B-spline:             -33.60557
+smoothing splines:                  NA (potrei calcolarlo ma perdita di tempo)
+
+
+#################
+model selection with AIC
+
+			AIC modello con optimized param
+linear regression:                  15.6832
+kernel regression:                  NA
+kernel knn regression:              NA
+cubic B-spline regression:          -32.88524
+natural cubic B-spline:             -33.60557
+smoothing splines:                  70.24792
+
+
+		RMSE modello con optimized params wrt tutti i dati
+linear regression:                  1.519333
+kernel regression:                  0.5804239
+kernel knn regression:              0.5375441
+cubic B-spline regression:          0.5266507
+natural cubic B-spline:             0.521259
+smoothing splines:                  0.5154455

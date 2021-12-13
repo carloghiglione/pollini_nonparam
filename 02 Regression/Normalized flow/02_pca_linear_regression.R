@@ -9,7 +9,7 @@ full_tab <- read.csv('full_tab_31_10_21.csv')
 flow <- full_tab$tot_in - full_tab$tot_out    # in - out
 flow.norm <- flow / full_tab$num_ric
 
-pat <- full_tab$Patent.applications..nonresidents + full_tab$Patent.applications..residents
+pat <- log(full_tab$Patent.applications..nonresidents + full_tab$Patent.applications..residents)
 #Z <- data.frame(flow, full_tab[, c(4,6,8,17)])
 Z <- data.frame(flow.norm, full_tab[, c(4,6,8,17)])
 #Z <- data.frame(flow.norm, full_tab[, c(4,6,8,17)], pat=pat)
@@ -105,9 +105,12 @@ xx = seq(min(scores.pc1), max(scores.pc1), length = 100)
 plot(scores.pc1, flow.norm, main = "Normalized Flow vs pca")
 lines(xx, b[1] + b[2]*xx, col='red')
 
+# RMSE
 RMSE <- sqrt(mean(mod.norm$fitted.values^2))
 RMSE
 
+# AIC
+extractAIC(mod.norm)
 
 
 ############################################################################################

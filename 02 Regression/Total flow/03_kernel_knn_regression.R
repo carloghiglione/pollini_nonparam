@@ -27,7 +27,7 @@ plot(uni_score, log_flow, main='Total flow vs Uni Score')
 
 ##################################################################################
 # MIXED GAUSSIAN KERNEL & KNN LOCAL LINEAR REGRESSION
-# NUMBER OF NEIGHBORS SELECTION WITH CROSS-VALIDATION ON LS
+# NUMBER OF NEIGHBORS SELECTION WITH CROSS-VALIDATION ON AIC
 
 # direcly select number of neighbors
 k <- 5
@@ -36,13 +36,13 @@ n <- length(log_flow)
 span <- 0.05
 k <- as.integer(span*n)
 
-mod.knn <- npreg(log_flow ~ uni_score, bwtype='adaptive_nn', bwmethod="cv.ls", ckertype = 'gaussian')
+mod.knn <- npreg(log_flow ~ uni_score, bwtype='adaptive_nn', bwmethod="cv.aic", ckertype = 'gaussian')
 summary(mod.knn)
 
 xx <- seq(min(uni_score), max(uni_score), length.out = 1000)
 preds <- predict(mod.knn, newdata = data.frame(uni_score = xx), se.fit=T)
 x11()
-plot(uni_score, log_flow, main = 'KNN regression')
+plot(uni_score, log_flow, main = 'Gaussian Kernel - KNN regression, AIC')
 lines(xx, preds$fit, col='red', lwd=2)
 matlines(xx, cbind(preds$fit - 2*preds$se.fit , preds$fit + 2*preds$se.fit ), 
          lty = 2, col = 'red', lwd=2)
@@ -114,7 +114,7 @@ summary(mod.knn)
 xx <- seq(min(uni_score), max(uni_score), length.out = 1000)
 preds <- predict(mod.knn.opt, newdata = data.frame(uni_score = xx), se.fit=T)
 x11()
-plot(uni_score, log_flow, main = 'Gaussian kernel regression')
+plot(uni_score, log_flow, main = 'Gaussian kernel - KNN regression')
 lines(xx, preds$fit, col='red', lwd=2)
 matlines(xx, cbind(preds$fit - 2*preds$se.fit , preds$fit + 2*preds$se.fit ), 
          lty = 2, col = 'red', lwd=2)
