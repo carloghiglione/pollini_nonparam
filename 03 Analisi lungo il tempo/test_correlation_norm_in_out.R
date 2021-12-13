@@ -26,10 +26,10 @@ outflow[k] <- rowMeans(outflow[,-1], na.rm=TRUE)[k[,1]]
 
 
 
-remove_outlier = F
+remove_outlier = T
 if(remove_outlier){
-  inflow <- norm_inflow[-4,]     # tolgo biellorussia che ha valori troppo alti (anche se tenerlo non cambia)
-  outflow <- norm_outflow[-4,]
+  inflow <- inflow[-4,]     # tolgo biellorussia che ha valori troppo alti (anche se tenerlo non cambia)
+  outflow <- outflow[-4,]
   n <- n-1
 }
 
