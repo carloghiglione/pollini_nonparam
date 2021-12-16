@@ -81,10 +81,11 @@ summary(s.spline.opt.aic)
 s.spline.opt.aic$aic
 
 
+
 x11()
-plot(s.spline.opt.aic)              # plots 95% confidence interval
+plot(s.spline.opt.aic, xlab='Uni Score', ylab='Log(Flow)', ylim=c(4,12.5))              # plots 95% confidence interval
 points(uni_score, log_flow)
-abline(v=s.spline.opt.aic$fit$knot, lty=2, col='gray')
+#abline(v=s.spline.opt.aic$fit$knot, lty=2, col='gray')
 
 RMSE.AIC <- sqrt(mean((predict(s.spline.opt.aic, uni_score)$y - log_flow)^2))
 RMSE.AIC
@@ -109,7 +110,9 @@ find.RMSE <- function(curr.lam, n_fold, kfolds){
   for(i in 1:n_fold){
     curr_data <- kfolds$datasets[[i]]
     curr_miss <- kfolds$folds[[i]]
-    mod.curr <- smooth.spline(curr_data$uni_score, curr_data$log_flow, lambda = curr.lam)
+    #mod.curr <- smooth.spline(curr_data$uni_score, curr_data$log_flow, lambda = curr.lam)            # vecchio
+    #mod.curr <- ss(curr_data$uni_score, curr_data$log_flow, lambda = curr.lam, knots = used_knots)   # opzione meno smoothing, migliore RMSE
+    mod.curr <- ss(curr_data$uni_score, curr_data$log_flow, lambda = curr.lam)                        # opzione più smoothing, peggiore RMSE
     RMSE[i] <- sqrt(mean((predict(mod.curr, curr_miss$uni_score)$y - curr_miss$log_flow)^2))
   }
   return(mean(RMSE)) 
@@ -117,11 +120,17 @@ find.RMSE <- function(curr.lam, n_fold, kfolds){
 
 
 # set the grid of dof search
-lam.grid <- seq(1e-7, 1e-3, by=1e-7)
+#lam.grid <- seq(1e-6, 1e-3, by=1e-6)      # opzione meno smoothing, migliore RMSE
+lam.grid <- 10^(-seq(0, 5, length=1000))   # opzione più smoothing, peggiore RMSE
+
+# set the used knots
+used_knots <- s.spline.opt.aic$fit$knot
+
+
 
 # define cores for parallel computation
 cl <- makeCluster(detectCores())
-clusterExport(cl, varlist = list("n_fold", "find.RMSE", "kfolds", "smooth.spline"))
+clusterExport(cl, varlist = list("n_fold", "find.RMSE", "kfolds", "smooth.spline", 'ss', 'used_knots'))
 RMSE_wrapper <- function(curr.lam){find.RMSE(curr.lam, n_fold, kfolds)} 
 
 # find RMSE for all grid points with parallel computing
@@ -133,7 +142,7 @@ opt.lam
 min(all_RMSE)
 
 x11()
-plot(lam.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs smoothing param')
+plot(lam.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs smoothing param', log='x')
 abline(v=opt.lam, col='red', lwd=2)
 
 
@@ -141,12 +150,15 @@ abline(v=opt.lam, col='red', lwd=2)
 #######################################################################################
 # SMOOTHING CUBIC B-SPLINES WITH OPTIMAL LAMBDA
 
-fit.smooth.opt <- smooth.spline(uni_score, log_flow, lambda = opt.lam)
+#fit.smooth.opt <- ss(uni_score, log_flow, lambda = opt.lam, knots = used_knots)   # opzione meno smoothing, meglio RMSE
+fit.smooth.opt <- ss(uni_score, log_flow, lambda = opt.lam)                        # opzione più smoothing, peggiore RMSE
+
 
 x11()
-plot(uni_score, log_flow, main = 'Smoothing cubic splines')
-lines(fit.smooth.opt, col='red', lwd=2)
-points(fit.smooth.opt$x, fit.smooth.opt$y, pch='x', col='blue')
+plot(fit.smooth.opt, xlab='Uni Score', ylab='Log(Flow)', ylim=c(4,12.5))              # plots 95% confidence interval
+points(uni_score, log_flow)
+#abline(v=fit.smooth.opt$fit$knot, lty=2, col='gray')
+
 
 RMSE <- sqrt(mean((predict(fit.smooth.opt, uni_score)$y- log_flow)^2))
 RMSE

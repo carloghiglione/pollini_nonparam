@@ -7,7 +7,7 @@ kernel regression:                  0.6699857  (attenzione, il modello fa schifo
 kernel knn regression:              0.6215914 
 cubic B-spline regression:          0.7829797 
 natural cubic B-spline:             0.6355823 
-smoothing splines:                  0.6302645
+smoothing splines:                  0.7858053
 
 
 		 RMSE modello con optimized params wrt tutti i dati
@@ -16,7 +16,7 @@ kernel regression:                  0.569026  (attenzione, il modello fa schifo)
 kernel knn regression:              0.5375441
 cubic B-spline regression:          0.5266507
 natural cubic B-spline:             0.521259
-smoothing splines:                  0.6120386
+smoothing splines:                  0.7811744
 
 
 			AIC modello con optimized param
