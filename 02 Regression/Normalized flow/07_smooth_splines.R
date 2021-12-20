@@ -130,7 +130,8 @@ find.RMSE <- function(curr.lam, n_fold, kfolds){
   for(i in 1:n_fold){
     curr_data <- kfolds$datasets[[i]]
     curr_miss <- kfolds$folds[[i]]
-    mod.curr <- smooth.spline(curr_data$scores.pc1, curr_data$flow.norm, lambda = curr.lam)
+    #mod.curr <- smooth.spline(curr_data$scores.pc1, curr_data$flow.norm, lambda = curr.lam)
+    mod.curr <- ss(curr_data$scores.pc1, curr_data$flow.norm, lambda = curr.lam)
     RMSE[i] <- sqrt(mean((predict(mod.curr, curr_miss$scores.pc1)$y - curr_miss$flow.norm)^2))
   }
   return(mean(RMSE)) 
@@ -138,11 +139,12 @@ find.RMSE <- function(curr.lam, n_fold, kfolds){
 
 
 # set the grid of dof search
-lam.grid <- seq(0.01, 1, by=0.001)
+#lam.grid <- seq(0.01, 1, by=0.001)
+lam.grid <- 10^(-seq(-1, 3, length=1000))  
 
 # define cores for parallel computation
 cl <- makeCluster(detectCores())
-clusterExport(cl, varlist = list("n_fold", "find.RMSE", "kfolds", "smooth.spline"))
+clusterExport(cl, varlist = list("n_fold", "find.RMSE", "kfolds", "smooth.spline", "ss"))
 RMSE_wrapper <- function(curr.lam){find.RMSE(curr.lam, n_fold, kfolds)} 
 
 # find RMSE for all grid points with parallel computing
@@ -154,7 +156,7 @@ opt.lam
 min(all_RMSE)
 
 x11()
-plot(lam.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs smoothing param')
+plot(lam.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs smoothing param', log='x')
 abline(v=opt.lam, col='red', lwd=2)
 
 
@@ -162,14 +164,19 @@ abline(v=opt.lam, col='red', lwd=2)
 #######################################################################################
 # SMOOTHING CUBIC B-SPLINES WITH OPTIMAL LAMBDA
 
-fit.smooth.opt <- smooth.spline(scores.pc1, flow.norm, lambda = opt.lam)
-#fit.smooth.opt <- ss(scores.pc1, flow.norm, lambda = opt.lam, nknots = 4)
+#fit.smooth.opt <- smooth.spline(scores.pc1, flow.norm, lambda = opt.lam)
+fit.smooth.opt <- ss(scores.pc1, flow.norm, lambda = opt.lam)
 
 
 x11()
-plot(scores.pc1, flow.norm, main = 'Smoothing cubic splines', ylim = c(-0.008, 0.015))
-lines(fit.smooth.opt, col='red', lwd=2)
-points(fit.smooth.opt$x, fit.smooth.opt$y, pch='x')
+plot(fit.smooth.opt)
+points(scores.pc1, flow.norm)
+
+
+#x11()
+#plot(scores.pc1, flow.norm, main = 'Smoothing cubic splines', ylim = c(-0.008, 0.015))
+#lines(fit.smooth.opt, col='red', lwd=2)
+#points(fit.smooth.opt$x, fit.smooth.opt$y, pch='x')
 
 RMSE <- sqrt(mean((predict(fit.smooth.opt, scores.pc1)$y- flow.norm)^2))
 RMSE
