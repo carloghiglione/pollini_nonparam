@@ -1,17 +1,19 @@
-
 library(survival)
 library(survminer)
 library(dplyr) 
 library(ggplot2)
 library(knitr)
 library(broom)
-setwd("D:/Marta/Politecnico/Non parametric statistics/Pollini project")
-# Take just EUR countries
-survival_data <- read.csv("D:/Marta/Politecnico/Non parametric statistics/Pollini project/survival_data.csv", sep="")
-country_list <- read.csv("D:/Marta/Politecnico/Non parametric statistics/Pollini project/country_list.csv")
-Eco_data_29_10_21 <- read.csv("D:/Marta/Politecnico/Non parametric statistics/Pollini project/Eco_data_29_10_21.csv")
-colnames(Eco_data_29_10_21)[1]<-"country"
 library(readxl)
+
+
+# load data
+rm(list=ls())
+survival_data <- read.csv("survival_data.csv", sep="")
+country_list <- read.csv("country_list.csv")
+Eco_data_29_10_21 <- read.csv("Eco_data_29_10_21.csv")
+colnames(Eco_data_29_10_21)[1]<-"country"
+
 Trips_labeled <- read_excel("Trips_labeled.xlsx")
 Trips_labeled<-data.frame(country=Trips_labeled$Country,mobility=Trips_labeled$Mob_lab, EU=Trips_labeled$EU_lab)
 countries<-country_list$Country
@@ -31,6 +33,10 @@ ggplot(data=head(data),aes(x=ID,y=Time)) +
   geom_point(aes(color=status_fact,shape=status_fact),size=6) +
   coord_flip()
 
+
+
+#####################################################################################################
+# SURVIVAL FOR ALL DATA 
 # head(Surv(data$Time, data$Cens==FALSE))
 Surv(data$Time, data$Cens==FALSE)
 
@@ -63,9 +69,9 @@ ggsurvplot(fit,
            fun='cumhaz',
            title="Cumulative Hazard Curve for outgoing people")
 
-#########################################################################
-#GROUPING
 
+#######################################################################################
+#GROUPING: 
 ### high vs low mobility
 
 fit_mob <- survfit(Surv(Time, Cens==FALSE) ~ mobility, data=data)
@@ -82,7 +88,11 @@ log_rank_test <- survdiff(Surv(Time, Cens==FALSE) ~ mobility, data=data)
 log_rank_test
 # 0.9 no evidence for difference 
 
-###country 
+
+
+#######################################################################################
+#GROUPING: 
+### country 
 
 fit_c <- survfit(Surv(Time, Cens==FALSE) ~ country, data=data)
 # levels(factor(data$mobility))
@@ -93,11 +103,15 @@ ggsurvplot(fit_c, conf.int = T,
            
            
            title="Kaplan-Meier Curves by country for outgoing people")
-log_rank_test <- survdiff(Surv(Time, Cens==FALSE) ~ country, data=data)
+log_rank_test <- pairwise_survdiff(Surv(Time, Cens==FALSE) ~ country, data=data)
 log_rank_test
 # 1e-05 difference at least in two countries 
 
-###country EU vs non-EU 
+
+
+#######################################################################################
+#GROUPING: 
+### country EU vs non-EU 
 
 levels(factor(data$EU))
 fit_eu <- survfit(Surv(Time, Cens==FALSE) ~ EU, data=data)
@@ -114,11 +128,16 @@ log_rank_test <- survdiff(Surv(Time, Cens==FALSE) ~ EU, data=data)
 log_rank_test
 # pval 0.4 no diff
 
-###uniscore<20 vs uniscore>=20
+
+
+#######################################################################################
+#GROUPING: 
+### uniscore<20 vs uniscore>=20 
+# (anche con altri cut non fa differenza significativa)
 
 range(data$uni_score)
 plot(data$uni_score)
-data$uni_score_20 <- cut(data$uni_score, breaks=c(0, 20, Inf), labels=c("low", "high"))
+data$uni_score_20 <- cut(data$uni_score, breaks=c(0, 5, Inf), labels=c("low", "high"))
 levels(factor(data$uni_score_20))
 
 fit_uni_score_20 <- survfit(Surv(Time, Cens==FALSE) ~ uni_score_20, data=data)
@@ -135,16 +154,17 @@ log_rank_test <- survdiff(Surv(Time, Cens==FALSE) ~ uni_score_20, data=data)
 log_rank_test
 # 0.3 no evidence 
 
-###uniscorenorm
+
+####################################################################################################
+# GROUPING: 
+### uniscorenorm
 
 range(data$uni_score_norm)
 plot(data$uni_score_norm)
-data$uni_score_norm_15 <- cut(data$uni_score, breaks=c(0, 0.15, Inf), labels=c("low", "high"))
-levels(factor(data$uni_score_20))
+data$uni_score_norm_cut <- cut(data$uni_score_norm, breaks=c(0, 0.10, Inf), labels=c("low", "high"))
 
-fit_uni_score_norm_15 <- survfit(Surv(Time, Cens==FALSE) ~ uni_score_norm_15, data=data)
-
-ggsurvplot(fit_uni_score_norm_15, conf.int = T,
+fit_uni_score_norm_cut <- survfit(Surv(Time, Cens==FALSE) ~ uni_score_norm_cut, data=data)
+ggsurvplot(fit_uni_score_norm_cut, conf.int = T,
            data=data,
            risk.table = TRUE, 
            surv.median.line = "hv", # Specify median survival
@@ -152,9 +172,108 @@ ggsurvplot(fit_uni_score_norm_15, conf.int = T,
            palette=c("darkblue","cyan3"), 
            title="Kaplan-Meier Curves by country for outgoing people")
 
-log_rank_test <- survdiff(Surv(Time, Cens==FALSE) ~ uni_score_norm_15, data=data)
+log_rank_test <- survdiff(Surv(Time, Cens==FALSE) ~ uni_score_norm_cut, data=data)
 log_rank_test
 # 1 no evidence 
+
+
+#############################################################################
+# GROUPING: 
+### GDP
+range(data$GDP)
+plot(data$GDP)
+data$GDP_cut <- cut(data$GDP, breaks=c(0, 25000, Inf), labels=c("low", "high"))
+
+fit_GDP_cut <- survfit(Surv(Time, Cens==FALSE) ~ GDP_cut, data=data)
+
+ggsurvplot(fit_GDP_cut, conf.int = T,
+           data=data,
+           risk.table = TRUE, 
+           surv.median.line = "hv", # Specify median survival
+           legend.labs=c("low","high"), legend.title="GDP",  
+           palette=c("darkblue","cyan3"), 
+           title="Kaplan-Meier Curves by country for outgoing people")
+
+log_rank_test <- survdiff(Surv(Time, Cens==FALSE) ~ GDP_cut, data=data)
+log_rank_test
+
+
+
+#############################################################################
+# GROUPING: 
+### Research
+range(data$Reasearch)
+plot(data$Reasearch)
+data$Res_cut <- cut(data$Reasearch, breaks=c(0, 1.5, Inf), labels=c("low", "high"))
+
+fit_Res_cut <- survfit(Surv(Time, Cens==FALSE) ~ Res_cut, data=data)
+
+ggsurvplot(fit_Res_cut, conf.int = T,
+           data=data,
+           risk.table = TRUE, 
+           surv.median.line = "hv", # Specify median survival
+           legend.labs=c("low","high"), legend.title="Research",  
+           palette=c("darkblue","cyan3"), 
+           title="Kaplan-Meier Curves by country for outgoing people")
+
+log_rank_test <- survdiff(Surv(Time, Cens==FALSE) ~ Res_cut, data=data)
+log_rank_test
+
+
+
+###############################################################################
+# GROUPING: 
+### Research & GDP
+data$Res_GDP <- paste0(data$Res_cut, data$GDP_cut)
+
+fit_Res_GDP <- survfit(Surv(Time, Cens==FALSE) ~ Res_GDP, data=data)
+
+ggsurvplot(fit_Res_GDP, conf.int = T,
+           data=data,
+           risk.table = TRUE, 
+           surv.median.line = "hv", # Specify median survival
+           #legend.labs=c("low","high"), legend.title="Research",  
+           #palette=c("darkblue","cyan3"), 
+           title="Kaplan-Meier Curves by country for outgoing people")
+
+log_rank_test <- pairwise_survdiff(Surv(Time, Cens==FALSE) ~ Res_GDP, data=data)
+log_rank_test
+
+
+# merge similar groups
+data$Res_GDP[which(data$Res_GDP == 'highlow')] <- 'lowhigh'
+
+fit_Res_GDP <- survfit(Surv(Time, Cens==FALSE) ~ Res_GDP, data=data)
+
+ggsurvplot(fit_Res_GDP, conf.int = T,
+           data=data,
+           risk.table = TRUE, 
+           surv.median.line = "hv", # Specify median survival
+           legend.labs=c("else","lowlow"), legend.title="Research",  
+           #palette=c("darkblue","cyan3"), 
+           title="Kaplan-Meier Curves by country for outgoing people")
+
+log_rank_test <- pairwise_survdiff(Surv(Time, Cens==FALSE) ~ Res_GDP, data=data)
+log_rank_test
+
+
+#merge similar groups
+data$Res_GDP[which(data$Res_GDP == 'highhigh')] <- 'lowhigh'
+
+fit_Res_GDP <- survfit(Surv(Time, Cens==FALSE) ~ Res_GDP, data=data)
+
+ggsurvplot(fit_Res_GDP, conf.int = T,
+           data=data,
+           risk.table = TRUE, 
+           surv.median.line = "hv", # Specify median survival
+           #legend.labs=c("low","high"), legend.title="Research",  
+           #palette=c("darkblue","cyan3"), 
+           title="Kaplan-Meier Curves by country for outgoing people")
+
+log_rank_test <- pairwise_survdiff(Surv(Time, Cens==FALSE) ~ Res_GDP, data=data)
+log_rank_test
+
+
 
 #############################################################################
 #COX MODELS
