@@ -121,7 +121,13 @@ anova_combination <- function(data, clust, B, seed = 17121998, prog = TRUE, outp
 
 #====
 
-#Trips_labeled <- read_excel(".../Trips_labeled.xlsx")
+Trips_labeled <- read_excel("Trips_labeled.xlsx")
+
+my_col=c('red', 'blue')
+plot(Trips_labeled$tot_in, Trips_labeled$tot_out, pch=19, main='Clustering Structure',
+     log='xy', xlab='InFlow', ylab='OutFlow', col=my_col[as.factor(Trips_labeled$Mob_lab)])
+legend('topleft', legend = c('High Mobility', 'Low Mobility'), fill = my_col)
+
 B = 1000
 
 anova_combination(data = Trips_labeled$tot_in, clust = Trips_labeled$Mob_lab, B = B, output = F)
