@@ -1,6 +1,8 @@
-# Nonparametric Statistics Project
+# Researchers' Migration Across Europe
 
-## Academic Year 2021/2022, Politecnico di Milano
+## Nonparametric Statistics Project
+
+### Academic Year 2021/2022, Politecnico di Milano
 
 ### Carlo Ghiglione, Jacopo Ghirri, Marta Mastropietro, Alfredo Gimenez Zapiola
 
