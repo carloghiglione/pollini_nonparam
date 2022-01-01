@@ -169,7 +169,7 @@ fit.smooth.opt <- ss(scores.pc1, flow.norm, lambda = opt.lam)
 
 
 x11()
-plot(fit.smooth.opt)
+plot(fit.smooth.opt, xlab='Composite Index', ylab='Normalized Flow')
 points(scores.pc1, flow.norm)
 
 

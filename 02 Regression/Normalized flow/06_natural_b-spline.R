@@ -53,7 +53,7 @@ scores.pc1 <- scores.pc1[-c(4,19)]
 
 
 # set the grid of dof search
-knots.grid <- seq(3, 20, by=1)
+knots.grid <- seq(3, 10, by=1)
 
 # function to find AIC for a certain bandwidth
 find.AIC <- function(curr.knots){
@@ -139,7 +139,7 @@ find.RMSE <- function(curr.knots, n_fold, kfolds){
 
 
 # set the grid of dof search
-knots.grid <- seq(3, 20, by=1)
+knots.grid <- seq(3, 10, by=1)
 
 # define cores for parallel computation
 cl <- makeCluster(detectCores())
@@ -155,7 +155,7 @@ opt.knots.RMSE
 min(all_RMSE)
 
 x11()
-plot(knots.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs #knots')
+plot(knots.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs n° knots', xlab = 'n° knots', ylab = 'RMSE')
 abline(v=opt.knots.RMSE, col='red', lwd=2)
 
 
@@ -190,3 +190,16 @@ RMSE <- sqrt(mean((mod.nat.3.opt.RMSE$residuals)^2))
 RMSE
 
 extractAIC(mod.nat.3.opt.RMSE)
+
+
+xx <- seq(min(scores.pc1), max(scores.pc1), length.out = 1000)
+preds <- predict(mod.spline.3.opt.RMSE, data.frame(scores.pc1 = xx), se.fit=T)
+y1 <- rev(preds$fit + 2*preds$se.fit)
+y2 <- preds$fit - 2*preds$se.fit
+
+x11()
+plot(scores.pc1, flow.norm, main = 'Natural Cubic B-Spline', ylab='FlowNorm', xlab='CIndex', ylim=c(-0.008,0.014))
+polygon(c(xx, rev(xx)), c(y2, y1),
+        col = "gray", lty = 0)
+points(scores.pc1, flow.norm)
+lines(xx, preds$fit, col='black', lwd=2)

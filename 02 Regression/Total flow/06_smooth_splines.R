@@ -46,7 +46,7 @@ legend('bottomright', legend = c('LOOCV', 'GCV'), fill = c('red', 'blue'))
 # find optimal number of knots with AIC
 
 # set the grid of dof search
-knots.grid <- seq(3, 20, by=1)
+knots.grid <- seq(3, 15, by=1)
 
 # function to find AIC for a certain bandwidth
 find.AIC <- function(curr.knots){
@@ -71,7 +71,7 @@ opt.knots.AIC
 min(all_AIC)
 
 x11()
-plot(knots.grid, all_AIC, type ='l', lwd='2', main='AIC vs #knots')
+plot(knots.grid, all_AIC, type ='l', lwd='2', main='AIC vs n° knots', ylab = 'AIC', xlab='n° knots')
 abline(v=opt.knots.AIC, col='red', lwd=2)
 
 
@@ -121,7 +121,7 @@ find.RMSE <- function(curr.lam, n_fold, kfolds){
 
 # set the grid of dof search
 #lam.grid <- seq(1e-6, 1e-3, by=1e-6)      # opzione meno smoothing, migliore RMSE
-lam.grid <- 10^(-seq(0, 5, length=1000))   # opzione più smoothing, peggiore RMSE
+lam.grid <- 10^(-seq(2, 5, length=1000))   # opzione più smoothing, peggiore RMSE
 
 # set the used knots
 used_knots <- s.spline.opt.aic$fit$knot
@@ -142,7 +142,7 @@ opt.lam
 min(all_RMSE)
 
 x11()
-plot(lam.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs smoothing param', log='x')
+plot(lam.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs Smoothing Param', log='x', ylab='RMSE', xlab='Lambda')
 abline(v=opt.lam, col='red', lwd=2)
 
 

@@ -138,7 +138,7 @@ find.RMSE <- function(curr.dof, n_fold, kfolds){
 
 
 # set the grid of dof search
-dof.grid <- seq(4, 20, by=1)
+dof.grid <- seq(4, 10, by=1)
 
 # define cores for parallel computation
 cl <- makeCluster(detectCores())
@@ -154,7 +154,7 @@ opt.dof
 min(all_RMSE)
 
 x11()
-plot(dof.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs dof')
+plot(dof.grid, all_RMSE, type ='l', lwd='2', main='Root MSE vs dof', ylab='RMSE', xlab='dof')
 abline(v=opt.dof, col='red', lwd=2)
 
 
@@ -182,6 +182,23 @@ lines(xx, preds$fit, col='red', lwd=2)
 matlines(xx, cbind(preds$fit - 2*preds$se.fit , preds$fit + 2*preds$se.fit ), 
          lty = 2, col = 'red', lwd=2)
 abline(v=used.knots, lty=2, col='gray')
+
+
+
+
+
+xx <- seq(min(scores.pc1), max(scores.pc1), length.out = 1000)
+preds <- predict(mod.spline.3.opt.RMSE, data.frame(scores.pc1 = xx), se.fit=T)
+y1 <- rev(preds$fit + 2*preds$se.fit)
+y2 <- preds$fit - 2*preds$se.fit
+
+x11()
+plot(scores.pc1, flow.norm, main = 'Cubic B-Spline', ylab='FlowNorm', xlab='CIndex', ylim=c(-0.01,0.027))
+polygon(c(xx, rev(xx)), c(y2, y1),
+        col = "gray", lty = 0)
+points(scores.pc1, flow.norm)
+lines(xx, preds$fit, col='black', lwd=2)
+
 
 RMSE <- sqrt(mean((mod.spline.3.opt.RMSE$residuals)^2))
 RMSE
