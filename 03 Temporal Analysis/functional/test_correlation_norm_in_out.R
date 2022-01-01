@@ -5,8 +5,8 @@ library(roahd)
 
 set.seed(1234)
 
-inflow <- read.csv('year_inflow.csv')
-outflow <- read.csv('year_outflow.csv')
+inflow <- read.csv('norm_year_inflow.csv')
+outflow <- read.csv('norm_year_outflow.csv')
 
 full_tab <- read.csv('full_tab_31_10_21.csv')
 
@@ -26,6 +26,15 @@ outflow[k] <- rowMeans(outflow[,-1], na.rm=TRUE)[k[,1]]
 
 
 
+remove_outlier = T
+if(remove_outlier){
+  inflow <- inflow[-4,]     # tolgo biellorussia che ha valori troppo alti (anche se tenerlo non cambia)
+  outflow <- outflow[-4,]
+  n <- n-1
+}
+
+
+
 # time of analysis
 tt <- 2006:2015
 
@@ -33,8 +42,8 @@ tt <- 2006:2015
 # plot data by country
 x11()
 par(mfrow=c(1,2))
-matplot(tt, t(inflow[,-1]), type = 'l', main='Inflow', xlab='Year', ylab='Number of people')
-matplot(tt, t(outflow[,-1]), type = 'l', main='Outflow', xlab='Year', ylab='Number of people')
+matplot(tt, t(inflow[,-1]), type = 'l', main='Inflow', xlab='Year', ylab='Norm. number of people')
+matplot(tt, t(outflow[,-1]), type = 'l', main='Outflow', xlab='Year', ylab='Norm. number of people')
 
 
 
@@ -45,8 +54,8 @@ outflow.fd <- Data2fd(y=as.matrix(t(outflow[,-1])), argvals = tt, basisobj = bas
 
 x11()
 par(mfrow=c(1,2))
-plot.fd(inflow.fd)
-plot.fd(outflow.fd)
+plot.fd(inflow.fd, xlab='Year', ylab='Norm. number of people', main='ciao')
+plot.fd(outflow.fd, xlab='Year', ylab='Norm. number of people')
 
 
 # create functional data objects
@@ -54,9 +63,6 @@ tt.grid <- seq(2006, 2015, length.out = 1000)
 inflow.eval <- t(eval.fd(tt.grid, inflow.fd))     # I transpose because in fData I need data by row
 outflow.eval <- t(eval.fd(tt.grid, outflow.fd))   # I transpose because in fData I need data by row
 
-# I  can eventually rescale the countries st they are all in the same scale, this makes the H0 not to be rejected
-# inflow.eval <- t(scale(eval.fd(tt.grid, inflow.fd)))     # I transpose because in fData I need data by row
-# outflow.eval <- t(scale(eval.fd(tt.grid, outflow.fd)))   # I transpose because in fData I need data by row
 
 fData.in <- fData(tt.grid, inflow.eval)
 fData.out <- fData(tt.grid, outflow.eval)
@@ -87,9 +93,20 @@ for(i in 1:B){
 
 
 x11()
-hist(SPC, breaks = 50, xlim = c(0,1), main='Spearman Correlation Index')
+hist(SPC, breaks = 50, xlim = c(0,1), main='Test on Spearman Correlation Index', col = 'gray', xlab='Spearman Correlation Index')
 abline(v=SPC0, col='red', lwd=3)
 
 pvalue <- sum(SPC>=SPC0)/B
 pvalue
 
+
+
+x11()
+par(mfrow=c(1,2))
+matplot(tt.grid, eval.fd(tt.grid, inflow.fd), xlab='Year', ylab='Normalized Flow', main='InFlow(t)', type = 'l', ylim=c(0, 0.015))
+matplot(tt.grid, eval.fd(tt.grid, outflow.fd), xlab='Year', ylab='Normalized Flow', main='OutFlow(t)', type = 'l', ylim=c(0, 0.015))
+
+
+x11()
+hist(SPC, breaks = 50, xlim = c(0,1), main='Independence Test', col = 'gray', xlab='T')
+abline(v=SPC0, col='red', lwd=3)
