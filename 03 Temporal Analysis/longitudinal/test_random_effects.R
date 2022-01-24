@@ -47,7 +47,8 @@ colnames(df.re)[3] = "net_flow"
 df.re <- merge(df.re, df.uni_score, by="Country")
 
 
-## Permutation test
+###########
+# Permutation test of mixed effects linear model
 #====
 library(mgcv)
 library(nlme)
@@ -56,9 +57,9 @@ library(nlme)
 
 # Test statistic
 lmm.full <-  lme(fixed = net_flow ~ 1 + uni_score + uni_score:time,
-                     random = ~ 1 + as.integer(time)|Country, # random effect ~N(time, Sigma)
-                     correlation= NULL,  # e_i are iid , ~N(0,sigma^2 I)
-                     data=df.re, method = "REML")
+                 random = ~ 1 + as.integer(time)|Country, # random effect ~N(time, Sigma)
+                 correlation= NULL,  # e_i are iid , ~N(0,sigma^2 I)
+                 data=df.re, method = "REML")
 summ.full <- summary(lmm.full)
 gam.full <- gam(log(net_flow) ~  s(uni_score, bs="cr") + 
                   uni_score:time + s(Country, bs="re"),
@@ -67,16 +68,16 @@ gam.full <- gam(log(net_flow) ~  s(uni_score, bs="cr") +
 getVarCov(lmm.full, df.re$Country,  type="random.effects")
 getVarCov(lmm.full, df.re$Country, type = "conditional") ## e_i term
 getVarCov(lmm.full, "IT", type = "marginal")  # Random term
-#getVarCov(g, df.re$Country, type = "marginal") 
+#getVarCov(lmm.full, df.re$Country, type = "marginal") 
 
 # t value
 T0 <- max(abs(summ.full$tTable[-c(1,2),4]))  # extract t value of uni_score:time
 
 # reduced model (under H0)
 lmm.red <-  lme(fixed = net_flow ~ 1 + uni_score, 
-                 random = ~ 1 + as.integer(time)|Country, # random effect ~N(time, Sigma)
-                 correlation= NULL,  # e_i are iid , ~N(0,sigma^2 I)
-                 data=df.re, method = "REML" )
+                random = ~ 1 + as.integer(time)|Country, # random effect ~N(time, Sigma)
+                correlation= NULL,  # e_i are iid , ~N(0,sigma^2 I)
+                data=df.re, method = "REML" )
 getVarCov(lmm.red, df.re$Country,  type="random.effects")
 getVarCov(lmm.red, "IT", type = "conditional") ## e_i term
 getVarCov(lmm.red, "IT", type = "marginal")  # Random term
@@ -93,9 +94,9 @@ for (i in seq(1,B)){
     e_b <- e.h0[sample(1:n)]
     y_perm <- y_hat_h0 + e_b
     lmm.perm <- lme(fixed = y_perm ~ 1 + uni_score + uni_score:time,
-                   random = ~ 1 + as.integer(time)|Country,
-                   correlation= NULL, 
-                   data=df.re, method = "REML")
+                    random = ~ 1 + as.integer(time)|Country,
+                    correlation= NULL, 
+                    data=df.re, method = "REML")
     T.perms= c(T.perms, max(abs(summary(lmm.perm)$tTable[-c(1,2),4])))
   }, error=function(e){ print(e)})
   
@@ -105,10 +106,91 @@ sapply(T.perms, abs)
 sum(T.perms >= T0)/length(T.perms)
 layout(1)
 hist(T.perms,xlim=range(c(T.perms,T0)),breaks=30,
+     main="Distribution of max{t_val1, t_val2...} under H0")
+abline(v=T0,col=2,lwd=2)
+hist(lmm.red$residuals, breaks=30, main="Histogram of residuals")
+
+#=====
+### use a robust linear mixed effects model
+# install.packages("robustlmm")
+#=====
+library(robustlmm)
+library(lme4)
+l.reg0 <- lmer(formula = net_flow ~ 1+  uni_score + 
+                 (I(as.numeric(time)) | Country),
+               data=df.re, REML=T)
+
+# full model (H1)
+r.reg.full <- rlmer(net_flow ~   1 + uni_score + uni_score:time +
+                  (I(as.numeric(time)) | Country),
+                   data=df.re,
+               rho.e = smoothPsi,
+               rho.b = cPsi,
+               method="DASvar")
+vcov(r.reg, full=T)
+lme4::VarCorr(r.reg)
+summ.robust.full <- summary(r.reg.full)
+
+
+# t value
+T0 <- max(abs(summ.robust.full$coefficients[-c(1,2),3]))
+
+# reduced model (under H0)
+r.reg.red <-  rlmer(net_flow ~ 1 + uni_score + (as.integer(time)|Country), # random effect ~N(time, Sigma)
+                 rho.e = smoothPsi,
+                 rho.b = cPsi,
+                data=df.re, method = "DASvar" )
+y_hat_h0 <- fitted.values(r.reg.red) 
+# residuals (asymptotic estimation)
+e.h0 <- residuals(r.reg.red)
+n <- length(e.h0)
+B <- 1e3
+T.perms <- NULL
+set.seed(41703192)
+#=====
+library(parallel)
+library(pbapply)
+detectCores()
+cl=makeCluster(16)
+
+  T.perms <- NULL
+  for (i in seq(1,B)){
+    # residuals asymptotically exchangeable
+    tryCatch( {  # in case it does not converge and throws an error
+      e_b <- e.h0[sample(1:n)]
+      y_perm <- y_hat_h0 + e_b
+      robustlmm.perm <- rlmer(y_perm ~ 1 + uni_score + uni_score:time+ (as.numeric(time)|Country),
+                              rho.e = smoothPsi,
+                              rho.b = cPsi,  data=df.re, method = "DASvar")
+      T.perms= c(T.perms, max(abs(summary(robustlmm.perm)$coefficients[-c(1,2),3]) ) )
+    }, error=function(e){ print(e)})
+    
+  }
+  sapply(T.perms, abs)
+ # return ( sum(T.perms >= T0)/length(T.perms) )
+
+T.perms <- permutation_it()
+clusterExport(cl,varlist=list("df.re", "permutation_it"))
+Ts <- NULL
+Tps=pbsapply(1, permutation_it,cl=cl)
+
+layout(1)
+hist(T.perms,xlim=range(c(T.perms,T0)),breaks=30,
      main="Distribution of max{t_val1, t_val2^...} under H0")
 abline(v=T0,col=3,lwd=2)
+###########
+# extract covariance
+#=====
+var.d <- crossprod(getME(r.reg,"Lambdat"))
+Zt <- getME(r.reg,"Zt")
+vr <- sigma(r.reg)^2
+var.b <- vr*(t(Zt) %*% var.d %*% Zt)
+sI <- vr * Diagonal(nrow(df.re))
+var.y <- var.b + sI
+cor(ranef(r.reg))
 
-# aDDENDUM: learnigng to use lme
+##########
+# Addendum: learnigng to use lme
 #====
 
 # l <- lm(flow_in ~ 1 + uni_score)
@@ -130,3 +212,4 @@ cm <- VarCorr(g)
 cm <- extract.lme.cov(g, data=df.re[,-3])
 shapiro.test(g$residuals)  
 hist(g$residuals)
+
