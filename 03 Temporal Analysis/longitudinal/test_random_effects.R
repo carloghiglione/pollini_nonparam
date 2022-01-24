@@ -1,6 +1,6 @@
 # Prepare dataframes
 #===== 
-setwd("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/03 Analisi lungo il tempo/")
+# setwd("~/Documents/Polimi/NONPARAMETRIC/pollini_nonparam/03 Analisi lungo il tempo/")
 df.uni_score <- read.csv("../02 Regression/Total flow/full_tab_31_10_21.csv")
 colnames(df)
 df.uni_score <- df.uni_score[, c(1,18)]
