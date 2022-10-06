@@ -1,10 +1,8 @@
 # Researchers' Migration Across Europe
 
-## Nonparametric Statistics Project
+### Nonparametric Statistics - A.Y. 2021/2022 - Politecnico di Milano
 
-### Academic Year 2021/2022, Politecnico di Milano
-
-### Carlo Ghiglione, Jacopo Ghirri, Marta Mastropietro, Alfredo Gimenez Zapiola
+Authors: Carlo Ghiglione, Jacopo Ghirri, Marta Mastropietro, Alfredo Gimenez Zapiola
 
 ### Abstract
 The goal of this project is to investigate the **high skilled workers and researches migration flows** in European Union and continental Europe. 
